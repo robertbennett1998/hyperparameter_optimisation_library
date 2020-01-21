@@ -1,0 +1,2 @@
+class InvalidHpoConfiguration(Exception):
+    pass
