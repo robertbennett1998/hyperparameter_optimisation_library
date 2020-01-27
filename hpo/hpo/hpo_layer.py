@@ -6,12 +6,8 @@ class Layer:
         self._hyperparameters = hyperparameters
 
     def build(self):
-        paramaters = dict()
-        keyVals = [param.get_key_val_pair() for param in self._paramaters + self._hyperparameters]
-        if len(keyVals) > 0:
-            paramaters.update(keyVals)
-
-        return self._layer_type(**paramaters)
+        parameters = self.all_parameters()
+        return self._layer_type(**parameters)
 
     def layer_name(self, layer_name=None):
         if not layer_name is None:
@@ -24,6 +20,14 @@ class Layer:
             self._layer_type = layer_type
 
         return self._layer_type
+
+    def all_parameters(self):
+        paramaters = dict()
+        keyVals = [param.get_key_val_pair() for param in self._paramaters + self._hyperparameters]
+        if len(keyVals) > 0:
+            paramaters.update(keyVals)
+
+        return paramaters
 
     def paramaters(self, paramaters=None):
         if not paramaters is None:

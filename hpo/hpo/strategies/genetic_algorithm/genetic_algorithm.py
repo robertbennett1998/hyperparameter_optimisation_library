@@ -1,20 +1,21 @@
 import numpy
 import random
 import time
-import hpo_genetic_algorithm.hpo_genetic_algorithm_crossover_stratergies as crossover_strategies
-import hpo_genetic_algorithm.hpo_genetic_algorithm_selection_stratergies as survivour_selection_strategies
-import hpo_genetic_algorithm.hpo_genetic_algorithm_mutation_stratergies as mutation_strategies
-import hpo_genetic_algorithm.hpo_genetic_algorithm_chromosome
+import hpo.strategies.genetic_algorithm.genetic_algorithm_crossover_stratergies as crossover_strategies
+import hpo.strategies.genetic_algorithm.genetic_algorithm_selection_stratergies as survivour_selection_strategies
+import hpo.strategies.genetic_algorithm.genetic_algorithm_mutation_stratergies as mutation_strategies
+import hpo.strategies.genetic_algorithm.genetic_algorithm_chromosome
 import hpo
 from tqdm import tqdm
 from datetime import datetime
 import os
 import json
 
-class GeneticAlgorithm(hpo.Stratergy):
+class GeneticAlgorithm(hpo.Strategy):
     def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage"):
         self._population_size = population_size
         self._population = [None for i in range(0, population_size)]
+        self._generation_history = list()
 
         self._max_iterations = max_iterations
 
@@ -41,21 +42,24 @@ class GeneticAlgorithm(hpo.Stratergy):
     def population(self):
         return self._population
 
-    def _generate_chromosome(self):
+    def _generate_chromosome(self, randomise=True):
         chromosome = self._chromosome_type()
-        for gene in chromosome.genes():
-                value_index = 0
-                values = random.sample(gene.value_range(), len(gene.value_range()))
-                gene.value(values[value_index])
-                while not chromosome.check_gene_constraints(gene):
-                    value_index += 1
+
+        if randomise:
+            for gene in chromosome.genes():
+                    value_index = 0
+                    values = random.sample(gene.value_range(), len(gene.value_range()))
                     gene.value(values[value_index])
+                    while not chromosome.check_gene_constraints(gene):
+                        value_index += 1
+                        gene.value(values[value_index])
+                        
         return chromosome
 
     def _generate_population(self):
         print("Generating Population:")
         for i in tqdm(range(0, self._population_size), unit="chromosones"):
-            self._population[i] = self._generate_chromosome()
+            self._population[i] = self._generate_chromosome(i > 0)
 
     def _select_mating_partner(self):
         totalFitness = 0
@@ -120,18 +124,24 @@ class GeneticAlgorithm(hpo.Stratergy):
     def generation_history(self):
         return self._generation_history
 
-    def _execute_population(self, iteration=0):
+    def _execute_population(self, data_type, iteration=0 ):
         print("Running Population For Iteration %d:" % iteration)
-        for chromosome in tqdm(self._population, unit="chromosones"):
-            chromosome.execute()
+        for chromosome in tqdm(self._population, unit="chromosone"):
+            chromosome.execute(data_type)
+            time.sleep(5)
 
-    def execute(self):
+        self._generation_history.append(self.population_info().copy())
+        print("Outputting generation results to %s" % self._history_file_path)
+        history_file = open(self._history_file_path, "w+")
+        print(self._generation_history)
+        history_file.write(json.dumps(self._generation_history))
+        history_file.close()
+
+    def execute(self, data_type):
         best_chromosome = None
         self._generation_history = list()
-
-        #calculate populations initial fitnesses
         self._generate_population()
-        self._execute_population()
+        self._execute_population(data_type)
 
         for iteration in tqdm(range(1, self._max_iterations + 1), unit="generation"):
             #create offset
@@ -159,14 +169,8 @@ class GeneticAlgorithm(hpo.Stratergy):
                     self._population.append(self._generate_chromosome())
 
             #calculate new fitnesses
-            self._execute_population(iteration)
+            self._execute_population(data_type, iteration)
             best_chromosome = self._get_best_chromosome()
-
-            self._generation_history.append(self.population_info().copy())
-            print("Outputting generation results to %s" % self._history_file_path)
-            history_file = open(self._history_file_path, "w+")
-            history_file.write(json.dumps(self._generation_history))
-            history_file.close()
 
         self._population.sort(key=lambda x : x.fitness(), reverse=True)
         return self._population, best_chromosome

@@ -1,11 +1,11 @@
-class Stratergy:
+class Strategy:
     def __init__(self):
         pass
 
-    def pre_execute(self):
+    def pre_execute(self, model_configuration):
         pass
 
-    def exectue(self):
+    def exectue(self, data):
         pass
 
     def post_execute(self):

@@ -87,8 +87,8 @@ class NPointCrossover(CrossoverStratergy):
     def segment_length(self, segmentLength=None):
         chromosome = self._chromosomeType()
         if not segmentLength is None:
-            if segmentLength < 0:
-                self._segmentLength = 0
+            if segmentLength < 1:
+                self._segmentLength = 1
             elif segmentLength > len(chromosome.genes()) - 1:
                 self._segmentLength = len(chromosome.genes()) - 1
             else:
