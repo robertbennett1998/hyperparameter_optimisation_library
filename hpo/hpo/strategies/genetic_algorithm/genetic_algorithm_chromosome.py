@@ -57,23 +57,24 @@ class DefaultChromosome(Chromosome):
         super().__init__(initial_model_configuration)
 
         self._genes = list()
-        for layer in self._model_configuration.layers():
-            for hyperparamater in layer.hyperparameters():
-                self._genes.append(genetic_algorithm.Gene(layer.layer_name() + "_" + hyperparamater.name(), hyperparamater.value_range(), hyperparamater.value(), hyperparamater.constraints()))
+        for hyperparameter in self._model_configuration.hyperparameters():
+            self._genes.append(genetic_algorithm.Gene(hyperparameter.identifier(), hyperparameter.value_range(), hyperparameter.value(), hyperparameter.constraints()))
 
     def execute(self, data_type):
-        for layer in self._model_configuration.layers():
-            for hyperparameter in layer.hyperparameters():
-                gene_name = layer.layer_name() + "_" + hyperparameter.name()
-                gene = next(x for x in self._genes if x.name() == gene_name)
-                #will throw if no gene is found with that name
-                hyperparameter.value(gene.value())
+        for hyperparameter in self._model_configuration.hyperparameters():
+            gene_identifier = hyperparameter.identifier()
+            gene = next(x for x in self._genes if x.name() == gene_identifier)
+            hyperparameter.value(gene.value())
 
-        remote_model = hpo.RemoteModel.remote(self._model_configuration.layers().copy())
+        remote_model = hpo.RemoteModel.remote(self._model_configuration.optimiser(), self._model_configuration.layers().copy(), self._model_configuration.number_of_epochs())
         remote_model.summary.remote()
         history_id = remote_model.train.remote(data_type)
         history = ray.get(history_id)
-        validation_accuracy = history["val_accuracy"][-1]
+        if history is None:
+            validation_accuracy = 0
+        else:
+            validation_accuracy = history["val_accuracy"][-1]
+
         self._fitness = int(validation_accuracy * 1000)
 
     def decode(self):

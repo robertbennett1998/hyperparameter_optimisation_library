@@ -102,6 +102,8 @@ class GeneticAlgorithm(hpo.Strategy):
         total_fitness = 0
         best_fitness = 0
         best_chromosome = None
+
+        number_of_failed_iterations = 0
         for chromosome in self._population.copy():
             fitness = chromosome.fitness()
             population.append(chromosome.decode())
@@ -110,12 +112,16 @@ class GeneticAlgorithm(hpo.Strategy):
                 best_fitness = fitness
                 best_chromosome = chromosome.decode()
 
+            if fitness == 0.0:
+                number_of_failed_iterations += 1
+
             total_fitness += fitness
             fitnesses.append(fitness)
 
+
         info["population_fitnesses"] = fitnesses
         info["population"] = population
-        info["avgerage_population_fitness"] = total_fitness / len(self._population)
+        info["avgerage_population_fitness"] = total_fitness / (len(self._population) - number_of_failed_iterations)
         info["best_fitness"] = best_fitness
         info["best_chromosome"] = best_chromosome
 
@@ -128,7 +134,6 @@ class GeneticAlgorithm(hpo.Strategy):
         print("Running Population For Iteration %d:" % iteration)
         for chromosome in tqdm(self._population, unit="chromosone"):
             chromosome.execute(data_type)
-            time.sleep(5)
 
         self._generation_history.append(self.population_info().copy())
         print("Outputting generation results to %s" % self._history_file_path)

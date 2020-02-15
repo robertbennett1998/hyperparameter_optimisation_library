@@ -1,4 +1,6 @@
 from math import ceil
+import random
+import time
 
 class SurvivorSelectionStratergy:
     def __init__(self):
@@ -45,8 +47,42 @@ class FitnessThresholdSelectionStratergy(SurvivorSelectionStratergy):
 
         return population
     
+class RouletteSelectionStrategy(SurvivorSelectionStratergy):
+    def __init__(self, survivour_percentage = 0.5):
+        super(RouletteSelectionStrategy, self).__init__()
+        self._survivour_percentage = survivour_percentage
+        print("Roulette Stratergy.")
+
+    def survivour_percentage(self, percentage=None):
+        if not percentage is None:
+            self._survivour_percentage = percentage
+
+        return self._survivour_percentage
+
+    def execute(self, population):
+        total_fitness = 0
+        for chromosome in population:
+            total_fitness += chromosome.fitness()
+
+        random.seed(time.time())
+        for i in range(int(self._survivour_percentage * len(population))):
+            value = int(random.uniform(0, total_fitness))
+            prev_culmative_value = 0
+            culmative_value = 0
+            survivours = list()
+            for chromosome in population:
+                culmative_value += chromosome.fitness()
+                if chromosome.fitness() >= prev_culmative_value and chromosome.fitness() < culmative_value:
+                    survivours.append(chromosome)
+
+                prev_culmative_value = culmative_value
+
+            return survivours
+
 def resolve_survivour_selection_stratergy(selectionStrat):
     if (selectionStrat == "threshold"):
         return FitnessThresholdSelectionStratergy()
+    elif (selectionStrat == "roulette"):
+        return RouletteSelectionStrategy()
 
     return selectionStrat

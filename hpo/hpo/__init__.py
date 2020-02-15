@@ -6,3 +6,4 @@ from hpo.hpo_layer import *
 from hpo.hpo_parameter import *
 from hpo.hpo_data import *
 from hpo.strategies import *
+from hpo.hpo_optimiser import *
