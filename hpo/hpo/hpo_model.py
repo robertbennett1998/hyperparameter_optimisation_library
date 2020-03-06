@@ -67,7 +67,7 @@ class ModelConfiguration:
 
         return self._number_of_epochs
 
-@ray.remote(num_gpus=1)
+@ray.remote
 class RemoteModel(object):
     def __init__(self, optimiser, layers, number_of_epochs=10):
         self._optimiser = optimiser
