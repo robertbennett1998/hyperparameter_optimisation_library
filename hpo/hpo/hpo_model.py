@@ -67,9 +67,12 @@ class ModelConfiguration:
 
         return self._number_of_epochs
 
-@ray.remote
+@ray.remote(num_gpus=1)
 class RemoteModel(object):
     def __init__(self, optimiser, layers, number_of_epochs=10):
+        print("ray.get_gpu_ids(): {}".format(ray.get_gpu_ids()))
+        print("CUDA_VISIBLE_DEVICES: {}".format(os.environ["CUDA_VISIBLE_DEVICES"]))        
+
         self._optimiser = optimiser
         self._layers = layers
         self._number_of_epochs = number_of_epochs
@@ -113,10 +116,10 @@ class RemoteModel(object):
         earlyStop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=2, verbose=True, mode='min', baseline=None, restore_best_weights=False)
         earlyStop2 = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0, patience=2, verbose=True, mode='max', baseline=None, restore_best_weights=False)
         
-        try:
-            self._training_history = model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps(), callbacks=[earlyStop, earlyStop2]).history
-        except:
-            return None
+       # try:
+        self._training_history = model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps(), callbacks=[earlyStop, earlyStop2]).history
+        #except:
+            #return None
             
         return self._training_history
 
