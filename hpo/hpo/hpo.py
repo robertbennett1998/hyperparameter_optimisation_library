@@ -1,4 +1,6 @@
 from hpo.hpo_exceptions import *
+from hpo.hpo_results import Results
+import os
 
 class Hpo:
     def __init__(self, model_configuration, data_type, optimisation_strategy):
@@ -16,13 +18,14 @@ class Hpo:
         if self._data_type is None:
             raise InvalidHpoConfiguration("No data type has being provided.")
 
+        tmp_results_path = os.path.join(os.path.join(os.getcwd(), ".tmp"), "hpo.results.tmp")
+        results = Results(stream_path=tmp_results_path)
+
         self._optimisation_strategy.pre_execute(self._model_configuration)
-
-        best_model = self._optimisation_strategy.execute(self._data_type)
-
+        self._optimisation_strategy.execute(self._data_type, results)
         self._optimisation_strategy.post_execute()
 
-        return best_model
+        return results.best_model(), results
 
     def optimisation_stratergy(self, optimisation_stratergy=None):
         if not optimisation_stratergy is None:

@@ -29,3 +29,10 @@ class Parameter:
 
     def constraints(self):
         return self._constraints
+
+    def serialize(self):
+        return self.__dict__
+
+    @staticmethod
+    def deserialize(data):
+        return Parameter(data["_parameter_name"], data["_parameter_value"], data["_value_range"], data["_constraints"], data["_identifier"])

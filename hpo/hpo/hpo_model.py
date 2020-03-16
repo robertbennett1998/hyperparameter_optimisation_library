@@ -3,23 +3,24 @@ import os
 import shutil
 
 class ModelConfiguration:
-    def __init__(self, optimiser=None, layers=None, number_of_epochs=10):
-        self._layers = layers
-        self._number_of_epochs = number_of_epochs
+    def __init__(self, optimiser, layers, loss_function, number_of_epochs):
         self._optimiser = optimiser
+        self._layers = layers
+        self._loss_function = loss_function
+        self._number_of_epochs = number_of_epochs
 
     def hyperparameters(self):
-        hyperparamters = list()
-        hyperparamters.extend(self._optimiser.hyperparameters())
+        hp = list()
+        hp.extend(self._optimiser.hyperparameters())
         for layer in self._layers:
-            hyperparamters.extend(layer.hyperparameters())
+            hp.extend(layer.hyperparameters())
 
-        return hyperparamters
+        return hp
 
     def layers(self, layers=None):
-        if not layers is None:
+        if layers is not None:
             self._layers = layers
-        
+
         return self._layers
 
     def total_number_of_parameters(self):
@@ -34,7 +35,7 @@ class ModelConfiguration:
         count += len(self._optimiser.parameters())
         for layer in self._layers:
             count += len(layer.parameters())
-            
+
         return count
 
     def number_of_hyperparameters(self):
@@ -58,33 +59,33 @@ class ModelConfiguration:
                 print(hp.identifier(), ": ", poss_values, " possible values.", sep="")
         print(self.number_of_hyperparameters(), "hyperparamters with", num_of_possible_values, "possible values.", num_of_possible_combinations, "(unconstrained) possible combinations.")
 
-    def optimiser(self):
+    def optimiser(self, optimiser=None):
+        if optimiser is not None:
+            self._optimiser = optimiser
+
         return self._optimiser
 
+    def loss_function(self, loss_function=None):
+        if loss_function is not None:
+            self._loss_function = loss_function
+
+        return self._loss_function
+
     def number_of_epochs(self, num_of_epochs=None):
-        if not num_of_epochs is None:
+        if num_of_epochs is not None:
             self._number_of_epochs = num_of_epochs
 
         return self._number_of_epochs
 
 @ray.remote(num_gpus=1)
 class RemoteModel(object):
-    def __init__(self, optimiser, layers, number_of_epochs=10):
+    def __init__(self, optimiser, layers, loss_function, number_of_epochs):
         self._optimiser = optimiser
         self._layers = layers
+        self._loss_function = loss_function
         self._number_of_epochs = number_of_epochs
-        self._training_history = None
 
-    def training_history(self):
-        return self._training_history
-
-    def number_of_epochs(self, num_of_epochs=None):
-        if not num_of_epochs is None:
-            self._number_of_epochs = num_of_epochs
-
-        return self._number_of_epochs
-
-    def summary(self):
+    def print_summary(self):
         print("Model Summary:")
         print("", self._optimiser.optimiser_name(), ":", sep='')
         for name, value in self._optimiser.all_parameters().items():
@@ -101,7 +102,7 @@ class RemoteModel(object):
         for layer in self._layers:
             model.add(layer.build())
 
-        model.compile(optimizer=self._optimiser.build(), loss='binary_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer=self._optimiser.build(), loss=self._loss_function, metrics=['accuracy'])
         return model
 
     def train(self, data_type, callbacks=None):
@@ -110,18 +111,4 @@ class RemoteModel(object):
         data.load()
         model = self.build()
 
-        earlyStop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=2, verbose=True, mode='min', baseline=None, restore_best_weights=False)
-        earlyStop2 = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0, patience=2, verbose=True, mode='max', baseline=None, restore_best_weights=False)
-        
-        try:
-            self._training_history = model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps(), callbacks=[earlyStop, earlyStop2]).history
-        except:
-            return None
-            
-        return self._training_history
-
-    def save(self, model_path):
-        pass
-
-    def load(self, model_path):
-        pass
+        return  model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps()).history

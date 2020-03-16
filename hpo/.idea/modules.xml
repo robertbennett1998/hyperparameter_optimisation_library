@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../CatsAndDogsHpo/.idea/CatsAndDogsHpo.iml" filepath="$PROJECT_DIR$/../../CatsAndDogsHpo/.idea/CatsAndDogsHpo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../early_sepsis_detection/.idea/early_sepsis_detection.iml" filepath="$PROJECT_DIR$/../../early_sepsis_detection/.idea/early_sepsis_detection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/hpo.iml" filepath="$PROJECT_DIR$/.idea/hpo.iml" />
+    </modules>
+  </component>
+</project>

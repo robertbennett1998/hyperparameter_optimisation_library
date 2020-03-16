@@ -5,9 +5,9 @@ import hpo.strategies.genetic_algorithm.genetic_algorithm_crossover_stratergies 
 import hpo.strategies.genetic_algorithm.genetic_algorithm_selection_stratergies as survivour_selection_strategies
 import hpo.strategies.genetic_algorithm.genetic_algorithm_mutation_stratergies as mutation_strategies
 import hpo.strategies.genetic_algorithm.genetic_algorithm_chromosome
+from hpo.hpo_results import Result
 import hpo
 from tqdm import tqdm
-from datetime import datetime
 import os
 import json
 
@@ -15,15 +15,11 @@ class GeneticAlgorithm(hpo.Strategy):
     def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage"):
         self._population_size = population_size
         self._population = [None for i in range(0, population_size)]
-        self._generation_history = list()
 
         self._max_iterations = max_iterations
 
         self._chromosome_type = chromosome_type
 
-        timestamp = datetime.now().strftime("%d_%b_%Y__%H_%M_%S")
-        self._history_file_path = os.path.join(os.getcwd(), "generation_history_%s.json" % timestamp)
-        
         if isinstance(crossover_stratergy, str):
             self._crossover_stratergy = crossover_strategies.resolve_crossover_stratergy(crossover_stratergy, self._chromosome_type)
         else:
@@ -97,85 +93,67 @@ class GeneticAlgorithm(hpo.Strategy):
 
     def population_info(self):
         info = dict()
-        fitnesses = list()
-        population = list()
         total_fitness = 0
         best_fitness = 0
-        best_chromosome = None
 
         number_of_failed_iterations = 0
         for chromosome in self._population.copy():
             fitness = chromosome.fitness()
-            population.append(chromosome.decode())
 
             if fitness > best_fitness:
                 best_fitness = fitness
-                best_chromosome = chromosome.decode()
 
             if fitness == 0.0:
                 number_of_failed_iterations += 1
 
             total_fitness += fitness
-            fitnesses.append(fitness)
 
-
-        info["population_fitnesses"] = fitnesses
-        info["population"] = population
-        info["avgerage_population_fitness"] = total_fitness / (len(self._population) - number_of_failed_iterations)
+        info["average_population_fitness"] = total_fitness / (len(self._population) - number_of_failed_iterations)
         info["best_fitness"] = best_fitness
-        info["best_chromosome"] = best_chromosome
-
         return info
 
     def generation_history(self):
         return self._generation_history
 
-    def _execute_population(self, data_type, iteration=0 ):
-        print("Running Population For Iteration %d:" % iteration)
-        for chromosome in tqdm(self._population, unit="chromosone"):
-            chromosome.execute(data_type)
-
-        self._generation_history.append(self.population_info().copy())
-        print("Outputting generation results to %s" % self._history_file_path)
-        history_file = open(self._history_file_path, "w+")
-        print(self._generation_history)
-        history_file.write(json.dumps(self._generation_history))
-        history_file.close()
-
-    def execute(self, data_type):
+    def execute(self, data_type, results):
         best_chromosome = None
         self._generation_history = list()
         self._generate_population()
-        self._execute_population(data_type)
 
-        for iteration in tqdm(range(1, self._max_iterations + 1), unit="generation"):
-            #create offset
+        for generation in tqdm(range(0, self._max_iterations + 1), unit="generation"):
+            # calculate fitnesses
+            print("Running Population For Iteration %d:" % generation)
+            chromosome_number = 1
+            for chromosome in tqdm(self._population, unit="chromosone"):
+                chromosome.execute(data_type)
+                results.add_result(Result(chromosome.model_configuration(), chromosome.fitness() if chromosome.fitness() > 0 else None, meta_data={"Generation": generation, "Chromosome:": chromosome_number}))
+                chromosome_number += 1
+
+            results.meta_data(self.population_info())
+
+            # create offset
             offspring = self._generate_offspring()
 
-            #mutate
+            # mutate
             for i in range(len(offspring)):
                 offspring[i] = self._mutation_stratergy.execute(offspring[i])
 
             best_chromosome = self._get_best_chromosome()
 
-            #select surviors
+            # select surviors
             self._survivour_selection_stratergy.execute(self._population)
 
-            #age population
+            # age population
             for chromosome in self._population:
                 chromosome._age = chromosome.age() + 1
 
-            #re-populate
+            # re-populate
             for i in range(self._population_size - len(self._population)):
                 self._population.append(offspring[random.sample(range(len(offspring)), 1)[0]])
 
             if not self._population_size - len(self._population) == 0:
                 for i in range(self._population_size - len(self._population)):
                     self._population.append(self._generate_chromosome())
-
-            #calculate new fitnesses
-            self._execute_population(data_type, iteration)
-            best_chromosome = self._get_best_chromosome()
 
         self._population.sort(key=lambda x : x.fitness(), reverse=True)
         return self._population, best_chromosome

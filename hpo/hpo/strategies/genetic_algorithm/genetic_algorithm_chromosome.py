@@ -34,6 +34,9 @@ class Chromosome(object):
     def genes(self):
         return self._genes
 
+    def model_configuration(self):
+        return self._model_configuration
+
     def execute(self, data_type):
         pass
 
@@ -52,6 +55,7 @@ class Chromosome(object):
             decoded_chromosome.append(gene.value())
         return decoded_chromosome
 
+
 class DefaultChromosome(Chromosome):
     def __init__(self, initial_model_configuration):
         super().__init__(initial_model_configuration)
@@ -66,11 +70,12 @@ class DefaultChromosome(Chromosome):
             gene = next(x for x in self._genes if x.name() == gene_identifier)
             hyperparameter.value(gene.value())
 
-        remote_model = hpo.RemoteModel.remote(self._model_configuration.optimiser(), self._model_configuration.layers().copy(), self._model_configuration.number_of_epochs())
-        remote_model.summary.remote()
+        remote_model = hpo.RemoteModel.remote(self._model_configuration.optimiser(), self._model_configuration.layers().copy(), self._model_configuration.loss_function(), self._model_configuration.number_of_epochs())
+        remote_model.print_summary.remote()
         history_id = remote_model.train.remote(data_type)
         history = ray.get(history_id)
         if history is None:
+            print("WARNING: Exception happened while training model. It was ignored. Imputing 0 as the fitness.")
             validation_accuracy = 0
         else:
             validation_accuracy = history["val_accuracy"][-1]
