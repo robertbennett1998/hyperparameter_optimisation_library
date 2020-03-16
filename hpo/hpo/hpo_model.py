@@ -77,7 +77,7 @@ class ModelConfiguration:
 
         return self._number_of_epochs
 
-@ray.remote(num_gpus=1)
+@ray.remote
 class RemoteModel(object):
     def __init__(self, optimiser, layers, loss_function, number_of_epochs):
         self._optimiser = optimiser
@@ -110,5 +110,16 @@ class RemoteModel(object):
         data = data_type()
         data.load()
         model = self.build()
+        
+        try:
+            self._training_history = model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps()).history
+        except:
+            return None
+            
+        return self._training_history
 
-        return  model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps()).history
+    def save(self, model_path):
+        pass
+
+    def load(self, model_path):
+        pass
