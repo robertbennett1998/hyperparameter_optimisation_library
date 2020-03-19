@@ -6,6 +6,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="early_sepsis_detection" />
     <orderEntry type="module" module-name="CatsAndDogsHpo" />
+    <orderEntry type="module" module-name="bird_classification" />
+    <orderEntry type="module" module-name="bird_classification" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="pytest" />

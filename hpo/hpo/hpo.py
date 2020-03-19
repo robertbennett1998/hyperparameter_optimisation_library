@@ -1,12 +1,18 @@
 from hpo.hpo_exceptions import *
 from hpo.hpo_results import Results
+from hpo.hpo_model import Model
 import os
 
 class Hpo:
-    def __init__(self, model_configuration, data_type, optimisation_strategy):
+    def __init__(self, model_configuration, data_type, optimisation_strategy, model_exception_handler=None):
         self._optimisation_strategy = optimisation_strategy
         self._model_configuration = model_configuration
         self._data_type = data_type
+        self._model_exception_handler = model_exception_handler
+
+    @staticmethod
+    def build_model(model_configuration):
+        return Model.from_model_configuration(model_configuration)
 
     def execute(self):
         if self._optimisation_strategy is None:
@@ -22,7 +28,7 @@ class Hpo:
         results = Results(stream_path=tmp_results_path)
 
         self._optimisation_strategy.pre_execute(self._model_configuration)
-        self._optimisation_strategy.execute(self._data_type, results)
+        self._optimisation_strategy.execute(self._data_type, results, self._model_exception_handler)
         self._optimisation_strategy.post_execute()
 
         return results.best_model(), results

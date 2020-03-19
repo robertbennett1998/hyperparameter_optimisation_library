@@ -77,13 +77,14 @@ class ModelConfiguration:
 
         return self._number_of_epochs
 
-@ray.remote
-class RemoteModel(object):
+
+class Model:
     def __init__(self, optimiser, layers, loss_function, number_of_epochs):
         self._optimiser = optimiser
         self._layers = layers
         self._loss_function = loss_function
         self._number_of_epochs = number_of_epochs
+        self._training_history = None
 
     def print_summary(self):
         print("Model Summary:")
@@ -105,17 +106,24 @@ class RemoteModel(object):
         model.compile(optimizer=self._optimiser.build(), loss=self._loss_function, metrics=['accuracy'])
         return model
 
-    def train(self, data_type, callbacks=None):
-        import tensorflow as tf
+    def train(self, data_type, exception_callback=None, callbacks=None):
         data = data_type()
         data.load()
         model = self.build()
-        
+
         try:
-            self._training_history = model.fit(data.training_data(), epochs=self._number_of_epochs, steps_per_epoch=data.training_steps(), validation_data=data.validation_data(), validation_steps=data.validation_steps()).history
+            self._training_history = model.fit(data.training_data(),
+                                               epochs=self._number_of_epochs,
+                                               steps_per_epoch=data.training_steps(),
+                                               validation_data=data.validation_data(),
+                                               validation_steps=data.validation_steps(),
+                                               callbacks=callbacks).history
         except:
+            if exception_callback is not None:
+                exception_callback()
+        finally:
             return None
-            
+
         return self._training_history
 
     def save(self, model_path):
@@ -123,3 +131,32 @@ class RemoteModel(object):
 
     def load(self, model_path):
         pass
+
+    @staticmethod
+    def from_model_configuration(model_configuration):
+        return Model(model_configuration.optimiser(), model_configuration.layers().copy(), model_configuration.loss_function(), model_configuration.number_of_epochs())
+
+
+@ray.remote(num_gpus=1)
+class RemoteModel(object):
+    def __init__(self, optimiser, layers, loss_function, number_of_epochs):
+        self._model = Model(optimiser, layers, loss_function, number_of_epochs)
+
+    def print_summary(self):
+        self._model.print_summary()
+
+    def build(self):
+        return self._model.build()
+
+    def train(self, data_type, callbacks=None):
+        return self._model.train(data_type, callbacks)
+
+    def save(self, model_path):
+        return self._model.save(model_path)
+
+    def load(self, model_path):
+        return self._model.save(model_path)
+
+    @staticmethod
+    def from_model_configuration(model_configuration):
+        return RemoteModel.remote(model_configuration.optimiser(), model_configuration.layers().copy(), model_configuration.loss_function(), model_configuration.number_of_epochs())

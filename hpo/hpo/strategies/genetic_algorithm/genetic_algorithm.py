@@ -115,7 +115,7 @@ class GeneticAlgorithm(hpo.Strategy):
     def generation_history(self):
         return self._generation_history
 
-    def execute(self, data_type, results):
+    def execute(self, data_type, results, model_exception_handler=None):
         best_chromosome = None
         self._generation_history = list()
         self._generate_population()
@@ -125,7 +125,7 @@ class GeneticAlgorithm(hpo.Strategy):
             print("Running Population For Iteration %d:" % generation)
             chromosome_number = 1
             for chromosome in tqdm(self._population, unit="chromosone"):
-                chromosome.execute(data_type)
+                chromosome.execute(data_type, model_exception_handler)
                 results.add_result(Result(chromosome.model_configuration(), chromosome.fitness() if chromosome.fitness() > 0 else None, meta_data={"Generation": generation, "Chromosome:": chromosome_number}))
                 chromosome_number += 1
 

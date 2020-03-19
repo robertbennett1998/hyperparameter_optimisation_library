@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../../CatsAndDogsHpo/.idea/CatsAndDogsHpo.iml" filepath="$PROJECT_DIR$/../../CatsAndDogsHpo/.idea/CatsAndDogsHpo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../bird_classification/.idea/bird_classification.iml" filepath="$PROJECT_DIR$/../../bird_classification/.idea/bird_classification.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../early_sepsis_detection/.idea/early_sepsis_detection.iml" filepath="$PROJECT_DIR$/../../early_sepsis_detection/.idea/early_sepsis_detection.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/hpo.iml" filepath="$PROJECT_DIR$/.idea/hpo.iml" />
     </modules>
