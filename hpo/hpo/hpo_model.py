@@ -148,7 +148,7 @@ class RemoteModel(object):
     def build(self):
         return self._model.build()
 
-    def train(self, data_type, callbacks=None):
+    def train(self, data_type, exception_callback=None, callbacks=None):
         return self._model.train(data_type, callbacks)
 
     def save(self, model_path):
