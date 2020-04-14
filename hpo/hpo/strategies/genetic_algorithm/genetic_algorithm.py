@@ -124,9 +124,9 @@ class GeneticAlgorithm(hpo.Strategy):
             # calculate fitnesses
             print("Running Population For Iteration %d:" % generation)
             chromosome_number = 1
-            for chromosome in tqdm(self._population, unit="chromosone"):
-                chromosome.execute(data_type, model_exception_handler)
-                results.add_result(Result(chromosome.model_configuration(), chromosome.fitness() if chromosome.fitness() > 0 else None, meta_data={"Generation": generation, "Chromosome:": chromosome_number}))
+            for chromosome in tqdm(self._population, unit="chromosome"):
+                training_history = chromosome.execute(data_type, model_exception_handler)
+                results.add_result(Result(chromosome.model_configuration(), training_history, chromosome.fitness() if chromosome.fitness() > 0 else None, meta_data={"Generation": generation, "Chromosome": chromosome_number}))
                 chromosome_number += 1
 
             results.meta_data(self.population_info())
@@ -155,7 +155,13 @@ class GeneticAlgorithm(hpo.Strategy):
                 for i in range(self._population_size - len(self._population)):
                     self._population.append(self._generate_chromosome())
 
-        self._population.sort(key=lambda x : x.fitness(), reverse=True)
+        def sort_func(x):
+            if x is None or x.fitness() is None:
+                return 0
+
+            return x.fitness()
+
+        self._population.sort(key=sort_func)
         return self._population, best_chromosome
 
     def mutation_strategy(self):

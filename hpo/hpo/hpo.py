@@ -14,7 +14,7 @@ class Hpo:
     def build_model(model_configuration):
         return Model.from_model_configuration(model_configuration)
 
-    def execute(self):
+    def execute(self, result_added_hook=None):
         if self._optimisation_strategy is None:
             raise InvalidHpoConfiguration("No optimisation stratergy selected.")
 
@@ -25,13 +25,13 @@ class Hpo:
             raise InvalidHpoConfiguration("No data type has being provided.")
 
         tmp_results_path = os.path.join(os.path.join(os.getcwd(), ".tmp"), "hpo.results.tmp")
-        results = Results(stream_path=tmp_results_path)
+        results = Results(result_added_hook=result_added_hook, stream_path=tmp_results_path)
 
         self._optimisation_strategy.pre_execute(self._model_configuration)
         self._optimisation_strategy.execute(self._data_type, results, self._model_exception_handler)
         self._optimisation_strategy.post_execute()
 
-        return results.best_model(), results
+        return results.best_result(), results
 
     def optimisation_stratergy(self, optimisation_stratergy=None):
         if not optimisation_stratergy is None:

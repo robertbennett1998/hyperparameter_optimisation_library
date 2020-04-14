@@ -5,7 +5,7 @@ class Layer:
         self._paramaters = parameters
         
         for parameter in self._paramaters:
-            parameter.identifier(self._layer_name + parameter.name())
+            parameter.identifier(self._layer_name + "_" + parameter.name())
         
         self._hyperparameters = hyperparameters
         for hyperparameter in self._hyperparameters:

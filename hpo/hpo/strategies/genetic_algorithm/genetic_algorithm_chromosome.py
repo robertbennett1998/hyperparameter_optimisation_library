@@ -82,6 +82,8 @@ class DefaultChromosome(Chromosome):
 
         self._fitness = int(validation_accuracy * 1000)
 
+        return history
+
     def decode(self):
         decoded_chromosome = list()
         for gene in self._genes:

@@ -8,6 +8,7 @@
     <orderEntry type="module" module-name="CatsAndDogsHpo" />
     <orderEntry type="module" module-name="bird_classification" />
     <orderEntry type="module" module-name="bird_classification" />
+    <orderEntry type="module" module-name="mnist" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="pytest" />

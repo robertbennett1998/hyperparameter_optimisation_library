@@ -9,6 +9,14 @@ class ModelConfiguration:
         self._loss_function = loss_function
         self._number_of_epochs = number_of_epochs
 
+    def parameters(self):
+        p = list()
+        p.extend(self._optimiser.paramaters())
+        for layer in self._layers:
+            p.extend(layer.paramaters())
+
+        return p
+
     def hyperparameters(self):
         hp = list()
         hp.extend(self._optimiser.hyperparameters())
@@ -16,6 +24,22 @@ class ModelConfiguration:
             hp.extend(layer.hyperparameters())
 
         return hp
+
+    def all_parameters(self):
+        p = list()
+        fp = list()
+        fp.extend(self._optimiser.paramaters())
+        fp.extend(self._optimiser.hyperparameters())
+
+        for layer in self._layers:
+            p.extend(layer.hyperparameters())
+
+        for layer in self._layers:
+            p.extend(layer.paramaters())
+
+        p.sort(key=lambda x: x.identifier())
+        fp.extend(p)
+        return fp
 
     def layers(self, layers=None):
         if layers is not None:
@@ -121,7 +145,6 @@ class Model:
         except:
             if exception_callback is not None:
                 exception_callback()
-        finally:
             return None
 
         return self._training_history
@@ -140,22 +163,56 @@ class Model:
 @ray.remote(num_gpus=1)
 class RemoteModel(object):
     def __init__(self, optimiser, layers, loss_function, number_of_epochs):
-        self._model = Model(optimiser, layers, loss_function, number_of_epochs)
+        self._optimiser = optimiser
+        self._layers = layers
+        self._loss_function = loss_function
+        self._number_of_epochs = number_of_epochs
+        self._training_history = None
 
     def print_summary(self):
-        self._model.print_summary()
+        print("Model Summary:")
+        print("", self._optimiser.optimiser_name(), ":", sep='')
+        for name, value in self._optimiser.all_parameters().items():
+            print("\t\t", name, "=", value)
+        for layer in self._layers:
+            print(layer.layer_name(), ":", sep='')
+            for name, value in layer.all_parameters().items():
+                print("\t\t", name, "=", value)
 
     def build(self):
-        return self._model.build()
+        import tensorflow as tf
+        model = tf.keras.models.Sequential()
+
+        for layer in self._layers:
+            model.add(layer.build())
+
+        model.compile(optimizer=self._optimiser.build(), loss=self._loss_function, metrics=['accuracy'])
+        return model
 
     def train(self, data_type, exception_callback=None, callbacks=None):
-        return self._model.train(data_type, callbacks)
+        data = data_type()
+        data.load()
+        model = self.build()
+
+        try:
+            self._training_history = model.fit(data.training_data(),
+                                               epochs=self._number_of_epochs,
+                                               steps_per_epoch=data.training_steps(),
+                                               validation_data=data.validation_data(),
+                                               validation_steps=data.validation_steps(),
+                                               callbacks=callbacks).history
+        except:
+            if exception_callback is not None:
+                exception_callback()
+            return None
+
+        return self._training_history
 
     def save(self, model_path):
-        return self._model.save(model_path)
+        pass
 
     def load(self, model_path):
-        return self._model.save(model_path)
+        pass
 
     @staticmethod
     def from_model_configuration(model_configuration):
