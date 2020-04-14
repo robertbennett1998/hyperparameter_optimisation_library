@@ -58,9 +58,9 @@ class Results:
         if result.score() < self._highest_score:
             result.clear_final_weights()
         else:
-            for result in self._history:
-                result.clear_final_weights()
-            self._highest_score = result.score()
+            for res in self._history:
+                res.clear_final_weights()
+            self._highest_score = int(result.score())
 
         self._history.append(result)
 
