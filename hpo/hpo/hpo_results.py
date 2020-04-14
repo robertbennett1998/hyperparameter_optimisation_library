@@ -21,6 +21,9 @@ class Result:
     def final_weights(self):
         return self._final_weights
 
+    def clear_final_weights(self):
+        self._final_weights = None
+
     def score(self):
         return self._score
 
@@ -47,10 +50,18 @@ class Results:
         self._meta_data = meta_data
         self._result_added_hook = result_added_hook
         self._stream_path = stream_path
+        self._highest_score = 0
 
         self._history = list()
 
     def add_result(self, result):
+        if result.score() < self._highest_score:
+            result.clear_final_weights()
+        else:
+            for result in self._history:
+                result.clear_final_weights()
+            self._highest_score = result.score()
+
         self._history.append(result)
 
         if self._stream_path is not None:
