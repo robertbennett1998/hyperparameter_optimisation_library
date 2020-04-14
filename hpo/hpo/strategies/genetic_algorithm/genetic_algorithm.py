@@ -108,7 +108,11 @@ class GeneticAlgorithm(hpo.Strategy):
 
             total_fitness += fitness
 
-        info["average_population_fitness"] = total_fitness / (len(self._population) - number_of_failed_iterations)
+        if not len(self._population) - number_of_failed_iterations == 0:
+            info["average_population_fitness"] = total_fitness / (len(self._population) - number_of_failed_iterations)
+        else:
+            info["average_population_fitness"] = 0
+
         info["best_fitness"] = best_fitness
         return info
 
@@ -125,8 +129,8 @@ class GeneticAlgorithm(hpo.Strategy):
             print("Running Population For Iteration %d:" % generation)
             chromosome_number = 1
             for chromosome in tqdm(self._population, unit="chromosome"):
-                training_history = chromosome.execute(data_type, model_exception_handler)
-                results.add_result(Result(chromosome.model_configuration(), training_history, chromosome.fitness() if chromosome.fitness() > 0 else None, meta_data={"Generation": generation, "Chromosome": chromosome_number}))
+                training_history, final_weights = chromosome.execute(data_type, model_exception_handler)
+                results.add_result(Result(chromosome.model_configuration(), training_history, chromosome.fitness() if chromosome.fitness() > 0 else None, final_weights, meta_data={"Generation": generation, "Chromosome": chromosome_number}))
                 chromosome_number += 1
 
             results.meta_data(self.population_info())

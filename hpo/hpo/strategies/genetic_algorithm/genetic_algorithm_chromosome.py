@@ -82,7 +82,8 @@ class DefaultChromosome(Chromosome):
 
         self._fitness = int(validation_accuracy * 1000)
 
-        return history
+        final_weights_id = remote_model.weights.remote()
+        return history, ray.get(final_weights_id)
 
     def decode(self):
         decoded_chromosome = list()

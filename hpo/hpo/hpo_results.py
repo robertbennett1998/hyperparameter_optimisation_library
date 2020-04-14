@@ -5,17 +5,21 @@ import matplotlib.pylab as plt
 
 
 class Result:
-    def __init__(self, model_configuration, training_history, score, meta_data=None):
+    def __init__(self, model_configuration, training_history, score, final_weights, meta_data=None):
         self._model_configuration = model_configuration
         self._score = score
         self._meta_data = meta_data
         self._training_history = training_history
+        self._final_weights = final_weights
 
     def training_history(self):
         return self._training_history
 
     def model_configuration(self):
         return self._model_configuration
+
+    def final_weights(self):
+        return self._final_weights
 
     def score(self):
         return self._score
