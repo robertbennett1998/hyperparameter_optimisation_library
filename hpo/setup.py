@@ -7,5 +7,5 @@ setup(name='hpo',
       author='Robert Bennett',
       author_email='robertbennett1998@outlook.com',
       license='MIT',
-      packages=['hpo', 'hpo.strategies', 'hpo.strategies.genetic_algorithm'],
+      packages=['hpo', 'hpo.strategies', 'hpo.strategies.genetic_algorithm', 'hpo.strategies.bayesian_method'],
       zip_safe=False)

@@ -25,6 +25,14 @@ class ModelConfiguration:
 
         return hp
 
+    def hyperparameter_values(self):
+        hp_values = list()
+        hp_values.extend([x.value() for x in self._optimiser.hyperparameters()])
+        for layer in self._layers:
+            hp_values.extend([x.value() for x in layer.hyperparameters()])
+
+        return hp_values
+
     def all_parameters(self):
         p = list()
         fp = list()
@@ -69,6 +77,13 @@ class ModelConfiguration:
             count += len(layer.hyperparameters())
 
         return count
+
+    def number_of_hyperparameter_combinations(self):
+        num_of_possible_combinations = 1
+        for hp in self.hyperparameters():
+            poss_values = len(hp.value_range())
+            num_of_possible_combinations *= poss_values
+        return num_of_possible_combinations
 
     def hyperparameter_summary(self, show_values=False):
         num_of_possible_values = 0

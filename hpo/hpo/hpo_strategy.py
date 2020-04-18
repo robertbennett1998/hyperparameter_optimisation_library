@@ -5,7 +5,7 @@ class Strategy:
     def pre_execute(self, model_configuration):
         pass
 
-    def exectue(self, data, model_exception_handler=None):
+    def execute(self, data_type, results, model_exception_handler=None):
         pass
 
     def post_execute(self):
