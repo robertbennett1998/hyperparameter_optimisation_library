@@ -60,7 +60,7 @@ class GaussianProcessSurrogate:
             for hyperparemeter in model_configuration.hyperparameters():
                 sample.append(random.sample(hyperparemeter.value_range(), 1)[0])
             samples.append(np.array(sample))
-        return np.array(samples)
+        return samples
 
     def _set_hyperparameters(self, model_configuration, config):
         for hyperparemeter, value in zip(model_configuration.hyperparameters(), config):
@@ -91,7 +91,7 @@ class RandomForestSurrogate:
 
     def acquire_best_posterior(self, model_configuration):
         samples = self._generate_random_samples(model_configuration)
-
+        print("\n\nSAMPLES:", samples, "\n\n")
         sample_means = self._predict_samples_performance(samples)
 
         if len(sample_means.shape) > 1:
@@ -121,8 +121,8 @@ class RandomForestSurrogate:
             sample = list()
             for hyperparemeter in model_configuration.hyperparameters():
                 sample.append(random.sample(hyperparemeter.value_range(), 1)[0])
-            samples.append(np.array(sample))
-        return np.array(samples)
+            samples.append(sample)
+        return samples
 
     def _set_hyperparameters(self, model_configuration, config):
         for hyperparemeter, value in zip(model_configuration.hyperparameters(), config):
