@@ -26,7 +26,7 @@ class FitnessThresholdSelectionStratergy(SurvivorSelectionStratergy):
 
         return upperChromosone, lowerChromosone
 
-    def threshold(self, threshold):
+    def threshold(self, threshold=None):
         if not threshold is None:
             if threshold > 1.0:
                 self._threshold = 1.0

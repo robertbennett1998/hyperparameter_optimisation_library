@@ -30,4 +30,4 @@ class BayesianMethod(hpo.Strategy):
             results.add_result(hpo.Result(next_config, history, score, ray.get(remote_model.weights.remote()), meta_data={"iteration": iteration}))
             self._surrogate_model.add_prior(next_config.hyperparameter_values(), score)
 
-        return self._surrogate_model.priors(), next_config
+        return self._surrogate_model.priors()

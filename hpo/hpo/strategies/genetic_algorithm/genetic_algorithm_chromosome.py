@@ -5,7 +5,6 @@ import ray
 class Chromosome(object):
     def __init__(self, initial_model_configuration):
         self._age = 0
-        self._ranges = None
         self._constraints = None
         self._genes = None
         self._fitness = None
@@ -27,9 +26,6 @@ class Chromosome(object):
 
     def check_gene_constraints(self, gene):
         return True
-
-    def gene_ranges(self):
-        return self._ranges
 
     def genes(self):
         return self._genes

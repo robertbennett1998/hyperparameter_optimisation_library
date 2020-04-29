@@ -19,7 +19,7 @@ class Optimiser:
         if not optimiser_type is None:
             self._optimiser_type = optimiser_type
 
-        return self._layer_type
+        return self._optimiser_type
 
     def all_parameters(self):
         paramaters = dict()

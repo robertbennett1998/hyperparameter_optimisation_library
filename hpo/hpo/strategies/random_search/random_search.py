@@ -23,4 +23,4 @@ class RandomSearch(hpo.Strategy):
             results.add_result(hpo.Result(self._model_configuration, history, score, ray.get(remote_model.weights.remote()),
                                           meta_data={"iteration": iteration}))
 
-        return results, results.best_result()
+        return results

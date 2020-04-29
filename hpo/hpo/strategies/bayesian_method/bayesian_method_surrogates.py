@@ -6,8 +6,22 @@ import scipy
 import numpy as np
 import random
 
-class GaussianProcessSurrogate:
+class SurrogateModel:
+    def __init__(self):
+        pass
+
+    def add_prior(self, sample, score):
+        pass
+
+    def acquire_best_posterior(self, model_configuration):
+        pass
+    
+    def priors(self):
+        pass
+
+class GaussianProcessSurrogate(SurrogateModel):
     def __init__(self, kernel=None, sample_size=1000):
+        super().__init__()
         self._gpr = GaussianProcessRegressor(kernel=kernel)
         self._sample_size = sample_size
 
@@ -68,8 +82,9 @@ class GaussianProcessSurrogate:
 
         return model_configuration
 
-class RandomForestSurrogate:
+class RandomForestSurrogate(SurrogateModel):
     def __init__(self, sample_size=1000):
+        super().__init__()
         self._rfr = RandomForestRegressor()
         self._sample_size = sample_size
 

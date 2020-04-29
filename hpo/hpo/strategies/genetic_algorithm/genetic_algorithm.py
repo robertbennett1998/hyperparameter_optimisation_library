@@ -13,6 +13,7 @@ import json
 
 class GeneticAlgorithm(hpo.Strategy):
     def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage"):
+        super().__init__()
         self._population_size = population_size
         self._population = [None for i in range(0, population_size)]
 
@@ -159,14 +160,7 @@ class GeneticAlgorithm(hpo.Strategy):
                 for i in range(self._population_size - len(self._population)):
                     self._population.append(self._generate_chromosome())
 
-        def sort_func(x):
-            if x is None or x.fitness() is None:
-                return 0
-
-            return x.fitness()
-
-        self._population.sort(key=sort_func)
-        return self._population, best_chromosome
+        return results
 
     def mutation_strategy(self):
         return self._mutation_stratergy
