@@ -1,8 +1,9 @@
-import hpo.hpo_remote_model
-import hpo.hpo_model
+import hpo.hpo_tensorflow_remote_model
+import hpo.hpo_tensorflow_model
+
 
 class Strategy:
-    def __init__(self, model_type=hpo.hpo_model.Model, remote_model_type=hpo.hpo_remote_model.RemoteModel):
+    def __init__(self, model_type=hpo.hpo_tensorflow_model.TensorFlowModel, remote_model_type=hpo.hpo_tensorflow_remote_model.TensorFlowRemoteModel):
         self._model_type = model_type
         self._remote_model_type = remote_model_type
 

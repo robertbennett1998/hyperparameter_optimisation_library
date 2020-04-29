@@ -1,8 +1,5 @@
 from hpo.hpo_exceptions import *
 from hpo.hpo_results import Results
-from hpo.hpo_model import Model
-from hpo.hpo_remote_model import RemoteModel
-import os
 
 class Hpo:
     def __init__(self, model_configuration, data_type, optimisation_strategy, model_exception_handler=None):

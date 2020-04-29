@@ -1,10 +1,9 @@
-import os
-import shutil
+import hpo.hpo_model_configuration_base
 
-class ModelConfiguration:
-    def __init__(self, optimiser, layers, loss_function, number_of_epochs):
+class TensorFlowModelConfiguration(hpo.hpo_model_configuration_base.ModeLConfigurationBase):
+    def __init__(self, layers, optimiser, loss_function, number_of_epochs):
+        super().__init__(layers)
         self._optimiser = optimiser
-        self._layers = layers
         self._loss_function = loss_function
         self._number_of_epochs = number_of_epochs
 
@@ -15,6 +14,14 @@ class ModelConfiguration:
             p.extend(layer.paramaters())
 
         return p
+
+    def parameter_values(self):
+        p_values = list()
+        p_values.extend([x.value() for x in self._optimiser.parameters()])
+        for layer in self._layers:
+            p_values.extend([x.value() for x in layer.parameters()])
+
+        return p_values
 
     def hyperparameters(self):
         hp = list()
@@ -84,19 +91,6 @@ class ModelConfiguration:
             num_of_possible_combinations *= poss_values
         return num_of_possible_combinations
 
-    def hyperparameter_summary(self, show_values=False):
-        num_of_possible_values = 0
-        num_of_possible_combinations = 1
-        for hp in self.hyperparameters():
-            poss_values = len(hp.value_range())
-            num_of_possible_combinations *= poss_values
-            num_of_possible_values += poss_values
-            if show_values:
-                print(hp.identifier(), ": ", poss_values, " possible values. Possible values: \n \t", hp.value_range(), sep="")
-            else:
-                print(hp.identifier(), ": ", poss_values, " possible values.", sep="")
-        print(self.number_of_hyperparameters(), "hyperparamters with", num_of_possible_values, "possible values.", num_of_possible_combinations, "(unconstrained) possible combinations.")
-
     def optimiser(self, optimiser=None):
         if optimiser is not None:
             self._optimiser = optimiser
@@ -114,3 +108,16 @@ class ModelConfiguration:
             self._number_of_epochs = num_of_epochs
 
         return self._number_of_epochs
+
+    def print_hyperparameter_summary(self, show_values=False):
+        num_of_possible_values = 0
+        num_of_possible_combinations = 1
+        for hp in self.hyperparameters():
+            poss_values = len(hp.value_range())
+            num_of_possible_combinations *= poss_values
+            num_of_possible_values += poss_values
+            if show_values:
+                print(hp.identifier(), ": ", poss_values, " possible values. Possible values: \n \t", hp.value_range(), sep="")
+            else:
+                print(hp.identifier(), ": ", poss_values, " possible values.", sep="")
+        print(self.number_of_hyperparameters(), "hyperparamters with", num_of_possible_values, "possible values.", num_of_possible_combinations, "(unconstrained) possible combinations.")

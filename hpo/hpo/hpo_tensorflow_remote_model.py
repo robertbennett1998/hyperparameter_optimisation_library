@@ -3,7 +3,7 @@ import os
 import shutil
 
 @ray.remote(num_gpus=1)
-class RemoteModel(object):
+class TensorFlowRemoteModel(object):
     def __init__(self, optimiser, layers, loss_function, number_of_epochs, weights=None):
         self._optimiser = optimiser
         self._layers = layers
@@ -85,8 +85,8 @@ class RemoteModel(object):
 
     @staticmethod
     def from_result(result):
-        return RemoteModel.remote(result.model_configuration.optimiser(), result.model_configuration.layers().copy(), result.model_configuration.loss_function(), result.model_configuration.number_of_epochs(), result.final_weights())
+        return TensorFlowRemoteModel.remote(result.model_configuration.optimiser(), result.model_configuration.layers().copy(), result.model_configuration.loss_function(), result.model_configuration.number_of_epochs(), result.final_weights())
 
     @staticmethod
     def from_model_configuration(model_configuration, weights=None):
-        return RemoteModel.remote(model_configuration.optimiser(), model_configuration.layers().copy(), model_configuration.loss_function(), model_configuration.number_of_epochs(), weights)
+        return TensorFlowRemoteModel.remote(model_configuration.optimiser(), model_configuration.layers().copy(), model_configuration.loss_function(), model_configuration.number_of_epochs(), weights)

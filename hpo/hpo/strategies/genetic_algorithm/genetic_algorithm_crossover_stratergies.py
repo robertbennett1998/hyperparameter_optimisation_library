@@ -7,16 +7,14 @@ class CrossoverStratergy:
         self._chromosomeType = chromosomeType
         random.seed(time.time())
 
-    def execute(self, chromosomeOne, chromosomeTwo):
+    def execute(self, chromosomeOne, chromosomeTwo, newchromosome):
         pass
 
 class OnePointCrossover(CrossoverStratergy):
     def __init__(self, chromosomeType):
         super(OnePointCrossover, self).__init__(chromosomeType)
 
-    def execute(self, chromosomeOne, chromosomeTwo):
-        newchromosome = self._chromosomeType()
-
+    def execute(self, chromosomeOne, chromosomeTwo, newchromosome):
         length = math.ceil(len(newchromosome.genes()) / 2)
 
         for i in range(length):
@@ -36,8 +34,7 @@ class UniformCrossover(CrossoverStratergy):
     def __init__(self, chromosomeType):
         super(UniformCrossover, self).__init__(chromosomeType)
 
-    def execute(self, chromosomeOne, chromosomeTwo):
-        newchromosome = self._chromosomeType()
+    def execute(self, chromosomeOne, chromosomeTwo, newchromosome):
         length = len(newchromosome.genes())
 
         for i in range(length):
@@ -60,8 +57,7 @@ class NPointCrossover(CrossoverStratergy):
 
         self._segmentLength = 1
 
-    def execute(self, chromosomeOne, chromosomeTwo):
-        newchromosome = self._chromosomeType()
+    def execute(self, chromosomeOne, chromosomeTwo, newchromosome):
         length = len(newchromosome.genes())
         currentchromosome = chromosomeOne
 
