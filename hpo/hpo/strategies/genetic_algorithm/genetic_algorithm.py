@@ -12,8 +12,8 @@ import os
 import json
 
 class GeneticAlgorithm(hpo.Strategy):
-    def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage"):
-        super().__init__()
+    def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage", model_type=hpo.hpo_model.Model, remote_model_type=hpo.hpo_remote_model.RemoteModel):
+        super().__init__(hpo.hpo_model.Model, hpo.hpo_remote_model.RemoteModel)
         self._population_size = population_size
         self._population = [None for i in range(0, population_size)]
 
