@@ -5,5 +5,6 @@
     <mapping directory="$PROJECT_DIR$/../../bird_classification" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../early_sepsis_detection" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../mnist" vcs="Git" />
   </component>
 </project>

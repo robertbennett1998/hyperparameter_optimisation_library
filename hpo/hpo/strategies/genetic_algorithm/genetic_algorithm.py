@@ -2,19 +2,15 @@ import random
 import hpo.strategies.genetic_algorithm.genetic_algorithm_crossover_stratergies as crossover_strategies
 import hpo.strategies.genetic_algorithm.genetic_algorithm_selection_stratergies as survivour_selection_strategies
 import hpo.strategies.genetic_algorithm.genetic_algorithm_mutation_stratergies as mutation_strategies
-import hpo.strategies.genetic_algorithm.genetic_algorithm_chromosome
 from hpo.hpo_results import Result
-import hpo
-import hpo.hpo_tensorflow_model
 import hpo.hpo_tensorflow_remote_model
 from tqdm import tqdm
 
 
 class GeneticAlgorithm(hpo.Strategy):
-    def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage", model_type=hpo.hpo_tensorflow_model.TensorFlowModel, remote_model_type=hpo.hpo_tensorflow_remote_model.TensorFlowRemoteModel):
-        super().__init__(model_type, remote_model_type)
+    def __init__(self, population_size, max_iterations, chromosome_type, crossover_stratergy = "onepoint", survivour_selection_stratergy = "threshold", mutation_stratergy = "percentage", remote_model_type=hpo.hpo_tensorflow_remote_model.TensorFlowRemoteModel):
+        super().__init__(remote_model_type)
         self._remote_model_type = remote_model_type
-        self._model_type = model_type
         self._population_size = population_size
         self._population = [None for i in range(0, population_size)]
 
@@ -41,7 +37,7 @@ class GeneticAlgorithm(hpo.Strategy):
         return self._population
 
     def _generate_chromosome(self, randomise=True):
-        chromosome = self._chromosome_type(self._model_type, self._remote_model_type)
+        chromosome = self._chromosome_type(self._remote_model_type)
 
         if randomise:
             for gene in chromosome.genes():
@@ -78,7 +74,7 @@ class GeneticAlgorithm(hpo.Strategy):
 
         for chromosome in self._population:
             matingPartner = self._select_mating_partner()
-            new_chromosome = self._chromosome_type(self._model_type, self._remote_model_type)
+            new_chromosome = self._chromosome_type(self._remote_model_type)
             offspring.append(self._crossover_stratergy.execute(chromosome, matingPartner, new_chromosome))
 
         return offspring

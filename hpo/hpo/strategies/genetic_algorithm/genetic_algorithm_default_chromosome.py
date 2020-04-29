@@ -1,14 +1,12 @@
-import hpo
 import hpo.strategies.genetic_algorithm as genetic_algorithm
 from hpo.strategies.genetic_algorithm.genetic_algorithm_chromosome import Chromosome
 import ray
 
 
 class DefaultChromosome(Chromosome):
-    def __init__(self, initial_model_configuration, model_type, remote_model_type):
-        super().__init__(initial_model_configuration, model_type, remote_model_type)
+    def __init__(self, initial_model_configuration, remote_model_type):
+        super().__init__(initial_model_configuration, remote_model_type)
         self._remote_model_type = remote_model_type
-        self._model_type = model_type
 
         self._genes = list()
         for hyperparameter in self._model_configuration.hyperparameters():

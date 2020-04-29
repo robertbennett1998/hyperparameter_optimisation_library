@@ -1,6 +1,6 @@
 import hpo.hpo_model_configuration_base
 
-class TensorFlowModelConfiguration(hpo.hpo_model_configuration_base.ModeLConfigurationBase):
+class DefaulDLModelConfiguration(hpo.hpo_model_configuration_base.ModeLConfigurationBase):
     def __init__(self, layers, optimiser, loss_function, number_of_epochs):
         super().__init__(layers)
         self._optimiser = optimiser

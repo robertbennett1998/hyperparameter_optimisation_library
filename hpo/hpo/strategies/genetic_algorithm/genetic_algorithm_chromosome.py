@@ -1,11 +1,6 @@
-import hpo.hpo_tensorflow_model
-import hpo.hpo_tensorflow_remote_model
-
-
 class Chromosome(object):
-    def __init__(self, initial_model_configuration, model_type, remote_model_type):
+    def __init__(self, initial_model_configuration, remote_model_type):
         self._remote_model_type = remote_model_type
-        self._model_type = model_type
         self._age = 0
         self._constraints = None
         self._genes = None

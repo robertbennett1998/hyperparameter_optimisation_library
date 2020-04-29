@@ -1,14 +1,12 @@
 import hpo
 import ray
-import hpo.hpo_tensorflow_model
 import hpo.hpo_tensorflow_remote_model
 
 
 class BayesianMethod(hpo.Strategy):
-    def __init__(self, model_configuration, number_of_iterations, surrogate_model, model_type=hpo.hpo_tensorflow_model.TensorFlowModel, remote_model_type=hpo.hpo_tensorflow_remote_model.TensorFlowRemoteModel):
-        super().__init__(model_type, remote_model_type)
+    def __init__(self, model_configuration, number_of_iterations, surrogate_model, remote_model_type=hpo.hpo_tensorflow_remote_model.TensorFlowRemoteModel):
+        super().__init__(remote_model_type)
         self._remote_model_type = remote_model_type
-        self._model_type = model_type
         self._model_configuration = model_configuration
         self._number_of_iterations = number_of_iterations
         self._surrogate_model = surrogate_model
