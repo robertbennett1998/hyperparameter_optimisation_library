@@ -7,6 +7,7 @@ class Hpo:
         self._model_configuration = model_configuration
         self._data_type = data_type
         self._model_exception_handler = model_exception_handler
+
     def execute(self, result_added_hook=None, temp_directory=None):
         if self._optimisation_strategy is None:
             raise InvalidHpoConfiguration("No optimisation stratergy selected.")

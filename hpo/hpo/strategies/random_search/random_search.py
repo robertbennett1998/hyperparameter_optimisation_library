@@ -25,6 +25,6 @@ class RandomSearch(hpo.Strategy):
             score = history["val_accuracy"][-1]
 
             results.add_result(hpo.Result(self._model_configuration, history, score, ray.get(remote_model.weights.remote()),
-                                          meta_data={"iteration": iteration}))
+                                          meta_data={"iteration": iteration + 1}))
 
         return results

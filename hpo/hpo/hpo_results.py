@@ -30,20 +30,6 @@ class Result:
     def meta_data(self):
         return self._meta_data
 
-    def plot_train_val_accuracy(self):
-        plt.plot(self._training_history["accuracy"])
-        plt.plot(self._training_history["val_accuracy"])
-        plt.title("Accuracy over epochs.")
-        plt.legend(["accuracy", "validation accuracy"])
-        plt.show()
-
-    def plot_train_val_loss(self):
-        plt.plot(self._training_history["loss"])
-        plt.plot(self._training_history["val_loss"])
-        plt.title("Loss over epochs.")
-        plt.legend(["loss", "validation loss"])
-        plt.show()
-
 
 class Results:
     def __init__(self, meta_data=None, result_added_hook=None, stream_path=None):
@@ -109,35 +95,3 @@ class Results:
                 best_score = result.score()
                 best_result = result
         return best_result
-
-    def plot_average_score_over_optimisation_period(self):
-        y = list()
-        total = 0
-        count = 0
-        for result in self._history:
-            if result.score() == 0:
-                continue
-            total += result.score()
-            count += 1
-            y.append(total / count)
-
-        plt.plot(y)
-        plt.legend(["Average accuracy"])
-        plt.title("Average accuracy over the optimisation period.")
-        plt.show()
-
-    def plot_average_loss_over_optimisation_period(self):
-        y = list()
-        total = 0
-        count = 0
-        for result in self._history:
-            if result.score() == 0:
-                continue
-            total += result.training_history()["val_loss"][-1]
-            count += 1
-            y.append(total / count)
-
-        plt.plot(y)
-        plt.legend(["Average loss"])
-        plt.title("Average (final validation) loss over the optimisation period.")
-        plt.show()

@@ -10,6 +10,7 @@ class TensorFlowRemoteModel(object):
         self._loss_function = loss_function
         self._number_of_epochs = number_of_epochs
         self._training_history = None
+        self._evaluation_history = None
         self._weights = weights
 
     def print_summary(self):
@@ -73,7 +74,7 @@ class TensorFlowRemoteModel(object):
             model.set_weights(self._weights)
 
         try:
-            self._training_history = model.evaluate(data.training_data()).history
+            self._evaluation_history = model.evaluate(data.training_data()).history
         except Exception as e:
             if exception_callback is not None:
                 exception_callback(e)
@@ -85,8 +86,8 @@ class TensorFlowRemoteModel(object):
 
     @staticmethod
     def from_result(result):
-        return TensorFlowRemoteModel.remote(result.model_configuration.optimiser(), result.model_configuration.layers().copy(), result.model_configuration.loss_function(), result.model_configuration.number_of_epochs(), result.final_weights())
-
+        return TensorFlowModel(result.model_configuration().optimiser(), result.model_configuration().layers().copy(), result.model_configuration().loss_function(), 
+                               result.model_configuration().number_of_epochs(), result.final_weights())
     @staticmethod
     def from_model_configuration(model_configuration, weights=None):
         return TensorFlowRemoteModel.remote(model_configuration.optimiser(), model_configuration.layers().copy(), model_configuration.loss_function(), model_configuration.number_of_epochs(), weights)

@@ -28,7 +28,8 @@ class BayesianMethod(hpo.Strategy):
             history = ray.get(history_id)
             score = history["val_accuracy"][-1]
 
-            results.add_result(hpo.Result(next_config, history, score, ray.get(remote_model.weights.remote()), meta_data={"iteration": iteration}))
+            results.add_result( hpo.Result(next_config, history, score, ray.get(remote_model.weights.remote()), 
+                                meta_data={"iteration": iteration + 1}))
             self._surrogate_model.add_prior(next_config.hyperparameter_values(), score)
 
         return results

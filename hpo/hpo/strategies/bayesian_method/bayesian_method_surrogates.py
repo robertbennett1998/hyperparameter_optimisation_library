@@ -111,8 +111,6 @@ class RandomForestSurrogate(SurrogateModel):
         if len(sample_means.shape) > 1:
             sample_means = sample_means[:, 0]
 
-        #best_prior_mean = self._get_best_prior_mean()
-        #cdf = scipy.stats.norm.cdf((sample_means - best_prior_mean) / (sample_standard_deviations + 1E-9))
         best_idx = np.argmax(sample_means)
 
         return self._set_hyperparameters(model_configuration, samples[best_idx])
