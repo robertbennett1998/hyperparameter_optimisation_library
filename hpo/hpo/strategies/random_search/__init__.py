@@ -1,0 +1,2 @@
+import hpo.strategies.random_search
+from hpo.strategies.random_search.random_search import RandomSearch
