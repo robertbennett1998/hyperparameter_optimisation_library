@@ -3,7 +3,7 @@ class Layer:
         self._layer_name = layer_name
         self._layer_type = layer_type
         self._paramaters = parameters
-        
+
         for parameter in self._paramaters:
             parameter.identifier(self._layer_name + "_" + parameter.name())
         
@@ -44,6 +44,7 @@ class Layer:
     def hyperparameters(self, hyperparameters=None):
         if not hyperparameters is None:
             self._hyperparameters = hyperparameters
+            
             for hyperparameter in self._hyperparameters:
                 hyperparameter.identifier(self._layer_name + "_" + hyperparameter.name())
 
